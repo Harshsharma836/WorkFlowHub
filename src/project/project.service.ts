@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Employee } from 'src/employee/schema/employee.schema';
 import { Model } from 'mongoose';
 import { Project } from './schema/project.schema';
-import { ProjectUpdate } from './schema/projectUpdate.schema';
+import { ProjectStatus } from './schema/ProjectStatus.schema';
 import { Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 
@@ -16,8 +16,8 @@ export class ProjectService {
   constructor(
     @InjectModel(Employee.name) private employeeModel: Model<Employee>,
     @InjectModel(Project.name) private projectModel: Model<Project>,
-    @InjectModel(ProjectUpdate.name)
-    private projectUpdateModel: Model<ProjectUpdate>,
+    @InjectModel(ProjectStatus.name)
+    private projectStatusModel: Model<ProjectStatus>,
   ) {}
 
   async create(createProjectDto: CreateProjectDto, employee) {
@@ -32,71 +32,79 @@ export class ProjectService {
       { new: true },
     );
 
-    // Creating a Project Update Collection by default
-    const dateNumber = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    let uniqueIdandDate = project._id.toString().slice(0, 20) + dateNumber;
-
-    let updateProject = await this.projectUpdateModel.create({
-      name: createProjectDto.name,
-      uniqueid: uniqueIdandDate, // for unique per day
-      description: '',
-      projectId: project._id,
-      employeeId: employee.employeeid,
-    });
-
     return project;
   }
 
   async findAll(employee) {
-    return await this.employeeModel.find({});
-    return `This action returns all project`;
+    let employeeId = employee.employeeid;
+    return await this.projectStatusModel.find({ employeeId });
   }
 
   findOne(id: number) {
     return `This action returns a #${id} project`;
   }
 
-  update(id: number, updateProjectDto: UpdateProjectDto) {
-    return `This action updates a #${id} project`;
+  async update(projectId: string, updateProjectDto: UpdateProjectDto) {
+
+    const projectUpdate = await this.projectStatusModel.findOneAndUpdate(
+      { projectId: projectId },
+      {
+        description: updateProjectDto.description,
+        status: updateProjectDto.status,
+      },
+      { new: true },
+    );
+    return projectUpdate
   }
 
   remove(id: number) {
     return `This action removes a #${id} project`;
   }
 
-  // Cron Implementing 
+  // Cron Implementing
+
+  // Run Only once at 12 AM Everyday
+  //@Cron('0 0 * * *')
+
+  // run only at once 1t 19:01
+  //@Cron('7 19 * * * ')
+  async sendDatatoUpdateProject() {
+      const projects = await this.projectModel.find({});
+      
+      // Create  a ref add ref 
+      // give emeployee ref id for this
+      for (const val of projects) {
+        console.log(val);
+        const updateProject = await this.projectStatusModel.create({val });
+        // Process the updateProject or handle errors as needed
+      }
+
+    // Iterate through the projects and create ProjectStatus documents
+    // const projectStatusDocuments = projects.map(project => {
+    //   return new ProjectStatus({
+    //     // name: project.name, 
+    //     // projectId: project._id, 
+    //   });
+    // });
+    
+
+    // let updateProject = await this.projectStatusModel.create({
+    //   name: createProjectDto.name,
+    //   uniqueid: uniqueIdandDate, // for unique per day
+    //   description: '',
+    //   projectId: project._id,
+    //   employeeId: employee.employeeid,
+    // });
+  }
+    
+
+
   // Check and fetch Data for Multiple Users , pending updates
-
   //@Cron('* * 19 * * *') // Run Cron EveryDay at 7 pm
-  @Cron('* * * * * *')  // Testing 
   async checkUpdateDaily() {
-    let ProjectUpdateDetails = await this.projectUpdateModel.find({
-        description : "",
-        status : "undone"
-    })
-
+    let ProjectUpdateDetails = await this.projectStatusModel.find({
+      status: 'undone',
+    });
     console.log(ProjectUpdateDetails);
   }
-
-  /*
-    // Cron Job
-  // Cron Run Every Second , 300000 : 5 minutes , 1000 : 1sec
-
-  @Cron('45 * * * * *')
-  async getPosts() {
-    const date_obj = Date.now();
-    const Postsdata = await this.postModel.findOne({
-      scheduleDateAndTime: { $gt: date_obj - 300000, $lt: date_obj + 300000 },
-      isActive: true,
-    });
-    if (Postsdata != null) {
-      const result = await this.postModel.findOneAndUpdate(
-        { email: Postsdata.email },
-        { isActive: false },
-        { new: true },
-      );
-      console.log('updated');
-    }
-  }
-  */
 }

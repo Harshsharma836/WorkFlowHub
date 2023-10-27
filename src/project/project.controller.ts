@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -26,24 +27,27 @@ export class ProjectController {
   }
 
   @UseGuards(JwtAuthGuardEmployee)
-  @Get()
+  @Get('updates')
   findAll(@Req() req) {
     return this.projectService.findAll(req.employee);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectService.findOne(+id);
-  }
-
   // Update By Project Id
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateProjectDto: UpdateProjectDto) {
+  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
     return this.projectService.update(id, updateProjectDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.projectService.remove(+id);
+  }
+
+  // Testing
+
+  @Post('cron')
+  check(){
+    console.log("Hit")
+    return this.projectService.sendDatatoUpdateProject();
   }
 }

@@ -3,10 +3,13 @@ import { SchemaTypes } from 'mongoose';
 import { Employee } from 'src/employee/schema/employee.schema';
 import { Project } from './project.schema';
 
+enum StatusEnum {
+  Done = 'done',
+  Undone = 'undone',
+}
+
 @Schema()
-export class ProjectUpdate {
-  @Prop({ required: true, unique: true })
-  uniqueid: string;
+export class ProjectStatus {
 
   @Prop()
   name: string;
@@ -23,7 +26,7 @@ export class ProjectUpdate {
   @Prop()
   description: string;
 
-  @Prop({ default: 'undone' })
+  @Prop({ default: StatusEnum.Undone, enum: StatusEnum })
   status: string;
 }
-export const ProjectUpdateSchema = SchemaFactory.createForClass(ProjectUpdate);
+export const ProjectStatusSchema = SchemaFactory.createForClass(ProjectStatus);

@@ -5,9 +5,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Employee, EmployeeSchema } from 'src/employee/schema/employee.schema';
 import { Project, ProjectSchema } from './schema/project.schema';
 import {
-  ProjectUpdate,
-  ProjectUpdateSchema,
-} from './schema/projectUpdate.schema';
+  ProjectStatus,
+  ProjectStatusSchema,
+} from './schema/ProjectStatus.schema';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -15,7 +15,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     MongooseModule.forFeature([
       { name: Employee.name, schema: EmployeeSchema },
       { name: Project.name, schema: ProjectSchema },
-      { name: ProjectUpdate.name, schema: ProjectUpdateSchema },
+      { name: ProjectStatus.name, schema: ProjectStatusSchema },
     ]),
   ],
   controllers: [ProjectController],
