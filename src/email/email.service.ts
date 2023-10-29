@@ -1,6 +1,3 @@
-// user: 'harshsharma72001@gmail.com',
-// pass: 'xppf haho tdnz kuyk ',
-
 // email.service.ts
 
 import { Injectable } from '@nestjs/common';
