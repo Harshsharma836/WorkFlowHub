@@ -11,12 +11,12 @@ export class JwtStrategyCompany extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'TOP',
+      secretOrKey: process.env.COMPANY_SECRET_KEY,
     });
   }
 
   async validate(payload: any) {
-    return { companyId: payload.companyid, companyName: payload.companyname };
+    return { companyId: payload.companyid, companyEmail: payload.companyemail };
   }
 }
 
@@ -29,16 +29,11 @@ export class JwtStrategyEmployee extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'TOP',
+      secretOrKey: process.env.EMPLOYEE_SECRET_KEY,
     });
   }
 
   async validate(payload: any) {
-    console.log('//////////////');
-    console.log(payload);
-    if (!payload.employeeid || !payload.email) {
-      throw new UnauthorizedException();
-    }
     return { employeeid: payload.employeeid, email: payload.email };
   }
 }

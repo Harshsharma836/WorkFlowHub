@@ -34,8 +34,11 @@ export class ProjectController {
 
   // Update By Project Id
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectService.update(id, updateProjectDto);
+  updateProjectStatus(
+    @Param('id') id: string,
+    @Body() updateProjectDto: UpdateProjectDto,
+  ) {
+    return this.projectService.updateProjectStatus(id, updateProjectDto);
   }
 
   @Delete(':id')
@@ -46,8 +49,12 @@ export class ProjectController {
   // Testing
 
   @Post('cron')
-  check(){
-    console.log("Hit")
-    return this.projectService.sendDatatoUpdateProject();
+  check() {
+    return this.projectService.createProjectStatus();
+  }
+
+  @Post('croncheck')
+  checks() {
+    return this.projectService.checkProjectStatusUpdates();
   }
 }

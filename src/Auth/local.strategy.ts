@@ -6,16 +6,16 @@ import { AuthService } from './auth.service';
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'company') {
   constructor(private authService: AuthService) {
-    // // for taking the input as companyname because passport bydefault take it as username
-    super({ usernameField: 'companyname' });
+    // Taking the input as companyemail because passport bydefault take it as username
+    super({ usernameField: 'companyemail' });
   }
 
-  async validate(companyname: string, password: string): Promise<any> {
-    if (companyname === undefined || password === undefined) {
+  async validate(companyemail: string, password: string): Promise<any> {
+    if (companyemail === undefined || password === undefined) {
       return 'Enter all Details';
     }
     const company = await this.authService.validateCompany(
-      companyname,
+      companyemail,
       password,
     );
     if (!company) {
@@ -31,7 +31,7 @@ export class LocalStrategyEmployee extends PassportStrategy(
   'employee',
 ) {
   constructor(private authService: AuthService) {
-    // // for taking the input as companyname because passport bydefault take it as username
+    // For taking the input as email because passport by default take it as username
     super({ usernameField: 'email' });
   }
 

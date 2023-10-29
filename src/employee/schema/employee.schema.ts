@@ -17,9 +17,6 @@ export class Employee {
   @Prop({ default: 0 })
   designation: string;
 
-  @Prop()
-  companyName: string;
-
   @Prop({ default: Date })
   createdAt: string;
 

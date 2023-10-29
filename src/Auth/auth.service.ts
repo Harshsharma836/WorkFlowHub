@@ -14,11 +14,11 @@ export class AuthService {
 
   // For Company
 
-  async validateCompany(companyname: string, password: string) {
-    if (companyname === undefined || password === undefined) {
+  async validateCompany(companyemail: string, password: string) {
+    if (companyemail === undefined || password === undefined) {
       return 'Enter all Details';
     }
-    const company = await this.companyService.getCompany({ companyname });
+    const company = await this.companyService.getCompany({ companyemail });
     if (!company) return null;
     const passwordValid = await bcrypt.compare(password, company.password);
     if (passwordValid === false) return null;
@@ -31,13 +31,17 @@ export class AuthService {
     return null;
   }
 
-  async loginCompany(company) {
+  async loginCompany(company, userType) {
     const payload = {
-      companyname: company.companyname,
+      companyemail: company.companyemail,
       companyid: company._id,
     };
+    const secretKey =
+      userType === 'company'
+        ? process.env.COMPANY_SECRET_KEY
+        : process.env.EMPLOYEE_SECRET_KEY;
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, { secret: secretKey }),
     };
   }
 
@@ -66,13 +70,17 @@ export class AuthService {
     return null;
   }
 
-  async loginEmployee(employee) {
+  async loginEmployee(employee, userType) {
     const payload = {
       email: employee.email,
       employeeid: employee._id,
     };
+    const secretKey =
+      userType === 'employee'
+        ? process.env.EMPLOYEE_SECRET_KEY
+        : process.env.COMPANY_SECRET_KEY;
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, { secret: secretKey }),
     };
   }
 }

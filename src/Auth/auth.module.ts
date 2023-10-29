@@ -12,18 +12,25 @@ import { JwtStrategyCompany, JwtStrategyEmployee } from './jwt.strategy';
 import { Employee, EmployeeSchema } from 'src/employee/schema/employee.schema';
 import { EmployeeService } from 'src/employee/employee.service';
 import { JwtAuthGuardCompany, JwtAuthGuardEmployee } from './jwt.auth.guard';
+import { OTP, OTPSchema } from 'src/employee/schema/otp.schema';
+import { EmailService } from 'src/email/email.service';
 
 @Module({
   imports: [
     CompanyModule,
     PassportModule,
     JwtModule.register({
-      secret: 'TOP',
+      secret: process.env.COMPANY_SECRET_KEY, // Default key for company tokens
+      signOptions: { expiresIn: '12h' },
+    }),
+    JwtModule.register({
+      secret: process.env.EMPLOYEE_SECRET_KEY, // Default key for employee tokens
       signOptions: { expiresIn: '12h' },
     }),
     MongooseModule.forFeature([
       { name: Company.name, schema: CompanySchema },
       { name: Employee.name, schema: EmployeeSchema },
+      { name: OTP.name, schema: OTPSchema },
     ]),
   ],
 
@@ -37,6 +44,7 @@ import { JwtAuthGuardCompany, JwtAuthGuardEmployee } from './jwt.auth.guard';
     EmployeeService,
     JwtStrategyCompany,
     JwtStrategyEmployee,
+    EmailService,
   ],
   controllers: [AuthController],
 })

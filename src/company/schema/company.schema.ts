@@ -8,8 +8,8 @@ export class Company {
   @Prop()
   companyname: string;
 
-  @Prop({ default: 0 })
-  totalEmployees: number;
+  @Prop()
+  companyemail: string;
 
   @Prop()
   registryNo: number;

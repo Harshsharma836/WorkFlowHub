@@ -22,14 +22,13 @@ export class CompanyService {
   // Creating Employee
 
   async createEmployee(createEmployeeDto, companyInfo) {
-    const { companyName, companyId } = companyInfo;
+    const { companyEmail, companyId } = companyInfo;
     const Alreadyemployee = await this.employeeModel.find({
       email: createEmployeeDto.email,
     });
     if (Alreadyemployee.length > 0) return `Employee Mail Already Exist`;
     const employee = await this.employeeModel.create({
       ...createEmployeeDto,
-      companyName,
       companyId,
     });
 
@@ -43,7 +42,7 @@ export class CompanyService {
   }
 
   async getEmployee(companyId) {
-    let data = await this.companyModel
+    const data = await this.companyModel
       .findById(companyId)
       .populate('employees')
       .exec();

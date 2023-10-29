@@ -10,12 +10,8 @@ enum StatusEnum {
 
 @Schema()
 export class ProjectStatus {
-
   @Prop()
   name: string;
-
-  @Prop({ default: Date })
-  date: Date;
 
   @Prop({ type: SchemaTypes.ObjectId, ref: 'Project' })
   projectId: Project;
@@ -24,9 +20,12 @@ export class ProjectStatus {
   employeeId: Employee;
 
   @Prop()
-  description: string;
+  update: string;
 
   @Prop({ default: StatusEnum.Undone, enum: StatusEnum })
   status: string;
+
+  @Prop({ default: new Date().toISOString().split('T')[0] }) // Default to the current date in "YYYY-MM-DD" format
+  timestamp: string;
 }
 export const ProjectStatusSchema = SchemaFactory.createForClass(ProjectStatus);

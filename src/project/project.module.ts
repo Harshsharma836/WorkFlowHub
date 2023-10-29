@@ -9,6 +9,7 @@ import {
   ProjectStatusSchema,
 } from './schema/ProjectStatus.schema';
 import { ScheduleModule } from '@nestjs/schedule';
+import { EmailService } from 'src/email/email.service';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { ScheduleModule } from '@nestjs/schedule';
     ]),
   ],
   controllers: [ProjectController],
-  providers: [ProjectService],
+  providers: [ProjectService, EmailService],
 })
 export class ProjectModule {}

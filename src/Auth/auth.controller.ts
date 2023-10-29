@@ -5,7 +5,6 @@ import {
   LocalAuthGuardEmployee,
 } from './local.auth.guard';
 import { JwtAuthGuardCompany, JwtAuthGuardEmployee } from './jwt.auth.guard';
-import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -17,12 +16,13 @@ export class AuthController {
   @Post('loginCom')
   async loginCompany(@Request() req) {
     console.log(req.company);
-    return this.authService.loginCompany(req.company);
+    return this.authService.loginCompany(req.company, 'company'); // giving the role
   }
 
   @UseGuards(JwtAuthGuardCompany)
   @Post('specialCompany')
   async specialCompany(@Req() req) {
+    console.log(req.company);
     return 'Hold';
   }
 
@@ -32,12 +32,13 @@ export class AuthController {
   @Post('loginEmp')
   async loginEmployee(@Request() req) {
     console.log(req.employee);
-    return this.authService.loginEmployee(req.employee);
+    return this.authService.loginEmployee(req.employee, 'employee'); // giving the role
   }
 
   @UseGuards(JwtAuthGuardEmployee)
   @Post('specialEmployee')
   async specialEmployee(@Req() req) {
+    console.log(req.employee);
     return 'Hold';
   }
 }

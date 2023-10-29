@@ -9,6 +9,6 @@ export class CreateEmployeeDto {
   password: string;
   @IsNotEmpty()
   designation: string;
-  companyName: string;
+  companyEmail: string;
   companyId: string;
 }

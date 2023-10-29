@@ -3,8 +3,8 @@ import { SchemaTypes } from 'mongoose';
 import { Employee } from 'src/employee/schema/employee.schema';
 
 enum StatusEnum {
-    Complete = 'done',
-    UnComplete = 'undone',
+  Complete = 'done',
+  UnComplete = 'undone',
 }
 
 @Schema()

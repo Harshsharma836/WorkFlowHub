@@ -1,5 +1,5 @@
 export class CreateCompanyDto {
-  companyname: string;
+  companyemail: string;
   registryNo: number;
   password: string;
 }
