@@ -9,6 +9,7 @@ import { ProjectStatus } from './schema/ProjectStatus.schema';
 import { Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { EmailService } from 'src/email/email.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ProjectService {
@@ -19,7 +20,10 @@ export class ProjectService {
     @InjectModel(Project.name) private projectModel: Model<Project>,
     @InjectModel(ProjectStatus.name)
     private projectStatusModel: Model<ProjectStatus>,
+    // for email service
     private readonly emailService: EmailService,
+    // for event
+    private eventEmitter: EventEmitter2
   ) {}
 
   async create(createProjectDto: CreateProjectDto, employee) {
@@ -90,7 +94,7 @@ export class ProjectService {
   }
 
   // We check at 7 p.m. that the employee has given an update on the project by checking the (status), using projectId on project status collection.
-  @Cron('0 19 * * *')
+  //@Cron('0 19 * * *')
   async checkProjectStatusUpdates() {
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];
@@ -106,13 +110,18 @@ export class ProjectService {
       if (projectStatus.timestamp === formattedDate) {
         const { employeeId } = projectStatus;
         const employee = await this.employeeModel.findOne(employeeId);
-        console.log('called');
+
         // Employee hasn't provided an update for today, take action, send a notification and a mail.
         const subject = `Project Update Reminder ${projectStatus.name}`;
         const text = `Friendly Reminder: Project ${projectStatus.name} Update Due at 7 PM`;
 
         try {
-          await this.emailService.sendReminder(employee.email, subject, text);
+          // for sending reminder mail to employees
+          //await this.emailService.sendReminder(employee.email, subject, text);
+          
+          
+          let a = this.eventEmitter.emit('rem', {employee})
+  
         } catch (err) {
           // Log the error or handle it appropriately
           console.error(

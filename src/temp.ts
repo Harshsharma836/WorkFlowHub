@@ -1,14 +1,9 @@
-// import { JwtModule } from "@nestjs/jwt";
+// let a = process.env.EMPLOYEE_SECRET_KEY
 
-// @Module({
-//     imports: [JwtModule.register({
-//       secret: "TOP",
-//       signOptions: { expiresIn: '60s' },
-//     })],
-//     providers: [{
-//       provide: 'JwtSecret1Servic    e',
-//       useExisting: JwtService,
-//     }],
-//     exports: ['JwtSecret1Service'],
-//   })
-//   export class JwtSecret1Module {}
+// console.log(a);
+
+let ans = process.env.MONGO_URL;
+console.log(ans)
+
+let secret = process.env.COMPANY_SECRET_KEY
+console.log(secret)
