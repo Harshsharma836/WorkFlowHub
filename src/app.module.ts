@@ -22,7 +22,7 @@ import { FcmNotificationModule } from './fcm-notification/fcm-notification.modul
     MongooseModule.forRoot(process.env.MONGO_URL),
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot({
-      global: true
+      global: true,
     }),
     FcmNotificationModule,
   ],

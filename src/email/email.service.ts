@@ -18,17 +18,7 @@ export class EmailService {
     });
   }
 
-  async sendOTPEmail(to: string, subject: string, text: string): Promise<void> {
-    const mailOptions = {
-      from: process.env.user,
-      to,
-      subject,
-      text,
-    };
-    await this.transporter.sendMail(mailOptions);
-  }
-
-  async sendReminder(to: string, subject: string, text: string): Promise<void> {
+  async sendEmail(to: string, subject: string, text: string): Promise<void> {
     const mailOptions = {
       from: process.env.user,
       to,

@@ -8,22 +8,16 @@ import {
   Delete,
   UseGuards,
   Req,
-  ParseIntPipe,
-  Sse,
+  Query,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { JwtAuthGuardEmployee } from 'src/Auth/jwt.auth.guard';
-import { Observable, fromEvent, interval, map } from 'rxjs';
-import { Interval } from '@nestjs/schedule';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Controller('project')
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService,
-  private readonly eventEmitter: EventEmitter2
-    ) {}
+  constructor(private readonly projectService: ProjectService) {}
 
   // Add Projects
   @UseGuards(JwtAuthGuardEmployee)
@@ -32,6 +26,14 @@ export class ProjectController {
     return this.projectService.create(createProjectDto, req.employee);
   }
 
+  // Implementing Pagination.
+  @UseGuards(JwtAuthGuardEmployee)
+  @Get('getprojects')
+  getProject(@Query() { limit, skip }, @Req() req) {
+    return this.projectService.getProjects(req.employee, skip, limit); //
+  }
+
+  // Updating the project (status)
   @UseGuards(JwtAuthGuardEmployee)
   @Get('updates')
   findAll(@Req() req) {
@@ -46,27 +48,6 @@ export class ProjectController {
   ) {
     return this.projectService.updateProjectStatus(id, updateProjectDto);
   }
-
-
-
-// @OnEvent('rem')
-// handleOrderCreatedEvent(data) {
-//   console.log(data)
-//   // handle and process "OrderCreatedEvent" event
-// }
-
-  // Send Server-send events
-  @Sse()
-  sseOrders() {
-    console.log("callled")
-    return fromEvent(this.eventEmitter, 'rem').pipe(
-        map((employee) => {
-          console.log("called")
-            return {data : employee} as MessageEvent
-        })
-    )
- } 
-
 
   @Delete(':id')
   remove(@Param('id') id: string) {

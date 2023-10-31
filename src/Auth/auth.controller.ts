@@ -15,7 +15,6 @@ export class AuthController {
   @UseGuards(LocalAuthGuardCompany)
   @Post('loginCom')
   async loginCompany(@Request() req) {
-    console.log(req.company);
     return this.authService.loginCompany(req.company, 'company'); // giving the role
   }
 
@@ -31,7 +30,6 @@ export class AuthController {
   @UseGuards(LocalAuthGuardEmployee)
   @Post('loginEmp')
   async loginEmployee(@Request() req) {
-    console.log(req.employee);
     return this.authService.loginEmployee(req.employee, 'employee'); // giving the role
   }
 

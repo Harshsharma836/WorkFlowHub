@@ -1,42 +1,39 @@
-import { Injectable, UseGuards } from '@nestjs/common';
-import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { Injectable } from '@nestjs/common';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Employee } from './schema/employee.schema';
 import { Model } from 'mongoose';
 import { EmailService } from 'src/email/email.service';
 import { OTP } from './schema/otp.schema';
-import { JwtAuthGuardEmployee } from 'src/Auth/jwt.auth.guard';
 import * as bcrypt from 'bcrypt';
+import { CompanyService } from 'src/company/company.service';
+import { Company } from 'src/company/schema/company.schema';
 @Injectable()
 export class EmployeeService {
   constructor(
     @InjectModel(Employee.name) private employeeModel: Model<Employee>,
     @InjectModel(OTP.name) private readonly otpModel: Model<OTP>,
+    @InjectModel(Company.name) private readonly companyModel: Model<Company>,
     private readonly emailService: EmailService,
   ) {}
 
-  create(createEmployeeDto: CreateEmployeeDto) {
-    return 'This action adds a new employee';
-  }
   async getEmployee(query: object): Promise<Employee> {
     return await this.employeeModel.findOne(query);
   }
 
-  findAll() {
-    return `This action returns all employee`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} employee`;
-  }
-
-  update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
-    return `This action updates a #${id} employee`;
-  }
-
   remove(id: number) {
     return `This action removes a #${id} employee`;
+  }
+
+  // send leave mail to company
+  async sendLeaveMail(employee , subject , text){
+    let employeeData = await this.employeeModel.findById(employee.employeeid);
+    let comapnyDetails = await this.companyModel.findById(employeeData.companyId)
+    let comanyEmail =  comapnyDetails.companyemail;
+    let ans = await this.emailService.sendEmail( comanyEmail , subject, text);
+    return {
+      res : ans
+    }
   }
 
   // For OTP :
@@ -63,7 +60,7 @@ export class EmployeeService {
     const subject = 'OTP for Password Reset';
     const text = `OTP for Password reset is ${otp} , valid for 10 minutes`;
     try {
-      await this.emailService.sendOTPEmail(employee.email, subject, text);
+      await this.emailService.sendEmail(employee.email, subject, text);
       return `OTP send successfully`;
     } catch (err) {
       return err;
@@ -95,11 +92,10 @@ export class EmployeeService {
     const salt = 5;
     const hashedPassword = await bcrypt.hash(newPassword, salt);
     employee.password = hashedPassword;
-    const a = await employee.save();
+    await employee.save();
     // Remove the used OTP
     await existingOTP.deleteOne();
     return `Passpord Updated successfully`;
   }
-
   //
 }

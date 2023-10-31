@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Patch,
@@ -8,9 +7,9 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
-import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { JwtAuthGuardEmployee } from 'src/Auth/jwt.auth.guard';
 
@@ -18,33 +17,15 @@ import { JwtAuthGuardEmployee } from 'src/Auth/jwt.auth.guard';
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  // Create Employee
-  @Post()
-  create(@Body() createEmployeeDto: CreateEmployeeDto) {
-    return this.employeeService.create(createEmployeeDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.employeeService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.employeeService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateEmployeeDto: UpdateEmployeeDto,
-  ) {
-    return this.employeeService.update(+id, updateEmployeeDto);
-  }
-
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.employeeService.remove(+id);
+  }
+
+  @UseGuards(JwtAuthGuardEmployee)
+  @Post('leavemail')
+  sendLeaveMail(@Body() body  , @Req() req){
+    return this.employeeService.sendLeaveMail(req.employee , body.subject , body.msg);
   }
 
   // otp

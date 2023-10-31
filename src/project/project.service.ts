@@ -10,6 +10,8 @@ import { Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { EmailService } from 'src/email/email.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { FcmNotificationService } from 'src/fcm-notification/fcm-notification.service';
+import { count } from 'console';
 
 @Injectable()
 export class ProjectService {
@@ -23,7 +25,9 @@ export class ProjectService {
     // for email service
     private readonly emailService: EmailService,
     // for event
-    private eventEmitter: EventEmitter2
+    private eventEmitter: EventEmitter2,
+    // for notification
+    private fcmNotificationService: FcmNotificationService,
   ) {}
 
   async create(createProjectDto: CreateProjectDto, employee) {
@@ -37,17 +41,25 @@ export class ProjectService {
       { $push: { projects: project._id } },
       { new: true },
     );
-
     return project;
+  }
+
+  async getProjects(employee, skip, limit) {
+    let count = await this.projectModel
+      .countDocuments({ employeeId: employee.employeeid })
+      .exec();
+    const page_total = Math.floor((count - 1) / limit) + 1;
+    const data = await this.projectModel.find().limit(limit).skip(skip).exec();
+    return {
+      data: data,
+      page_total: page_total,
+      status: 200,
+    };
   }
 
   async findAll(employee) {
     const employeeId = employee.employeeid;
     return await this.projectStatusModel.find({ employeeId });
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} project`;
   }
 
   // When an employee gives an update on a project (today-date) by default status goes to done.
@@ -64,12 +76,12 @@ export class ProjectService {
     );
     if (projectUpdate == null)
       return `No Project Avilable by this ID ${projectId}`;
-    console.log(projectUpdate);
     return projectUpdate;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} project`;
+  async remove(id: number) {
+    let projectRemove = await this.projectModel.findOneAndDelete({ id });
+    return `Project removed , Id is ${id}`;
   }
 
   // Cron Implementing
@@ -94,7 +106,8 @@ export class ProjectService {
   }
 
   // We check at 7 p.m. that the employee has given an update on the project by checking the (status), using projectId on project status collection.
-  //@Cron('0 19 * * *')
+  //@Cron('20 * * * * *')
+  // @Cron('0 19 * * *')
   async checkProjectStatusUpdates() {
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];
@@ -114,14 +127,19 @@ export class ProjectService {
         // Employee hasn't provided an update for today, take action, send a notification and a mail.
         const subject = `Project Update Reminder ${projectStatus.name}`;
         const text = `Friendly Reminder: Project ${projectStatus.name} Update Due at 7 PM`;
-
+        // This token is send by from the frontend , It is unique for very user.
+        const token =
+          'fSP_VgFKzhSmsZNFRaphxB:APA91bFXHIgmbI6RLDcnYss9JlyJLGpKYilFWEsgYe_rs8KhswImewbS33sSigFLWF2VKjwh54FhB7GSQHBZqgKYhpxcObu3AofGp9ZJLKPXIH1DKxIYa8nwhaZehnYbX0P4IPzLNF2Q'; // comes from the frontend
         try {
-          // for sending reminder mail to employees
-          //await this.emailService.sendReminder(employee.email, subject, text);
-          
-          
-          let a = this.eventEmitter.emit('rem', {employee})
-  
+          // It's sending reminder mail to employees
+          //await this.emailService.sendEmail(employee.email, subject, text);
+
+          // for sending notification to employees
+          await this.fcmNotificationService.sendingNotificationOneUser(
+            token,
+            subject,
+            text,
+          );
         } catch (err) {
           // Log the error or handle it appropriately
           console.error(

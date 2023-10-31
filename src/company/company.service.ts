@@ -22,7 +22,7 @@ export class CompanyService {
   // Creating Employee
 
   async createEmployee(createEmployeeDto, companyInfo) {
-    const { companyEmail, companyId } = companyInfo;
+    const { companyId } = companyInfo;
     const Alreadyemployee = await this.employeeModel.find({
       email: createEmployeeDto.email,
     });

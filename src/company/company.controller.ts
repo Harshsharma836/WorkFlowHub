@@ -1,21 +1,10 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Req, UseGuards } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 
 import * as bcrypt from 'bcrypt';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { JwtAuthGuardCompany } from 'src/Auth/jwt.auth.guard';
-import { LocalAuthGuardCompany } from 'src/Auth/local.auth.guard';
 
 @Controller('company')
 export class CompanyController {

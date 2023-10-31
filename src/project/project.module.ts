@@ -8,8 +8,8 @@ import {
   ProjectStatus,
   ProjectStatusSchema,
 } from './schema/ProjectStatus.schema';
-import { ScheduleModule } from '@nestjs/schedule';
 import { EmailService } from 'src/email/email.service';
+import { FcmNotificationService } from 'src/fcm-notification/fcm-notification.service';
 
 @Module({
   imports: [
@@ -20,6 +20,6 @@ import { EmailService } from 'src/email/email.service';
     ]),
   ],
   controllers: [ProjectController],
-  providers: [ProjectService, EmailService],
+  providers: [ProjectService, EmailService, FcmNotificationService],
 })
 export class ProjectModule {}

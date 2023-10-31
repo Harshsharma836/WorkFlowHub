@@ -40,7 +40,6 @@ export class LocalStrategyEmployee extends PassportStrategy(
       return 'Enter all Details';
     }
     const employee = await this.authService.validateEmployee(email, password);
-    console.log(employee);
     if (!employee) {
       throw new UnauthorizedException();
     }
