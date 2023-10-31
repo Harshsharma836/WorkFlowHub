@@ -51,11 +51,8 @@ export class AuthService {
     if (email === undefined || password === undefined) {
       return 'Enter all Details';
     }
-    console.log(email);
-    console.log(password);
     const employee = await this.employeeService.getEmployee({ email });
     if (!employee) return null;
-    console.log('Password ' + employee.password);
     const passwordValid = await bcrypt.compare(password, employee.password);
     if (passwordValid === false) {
       console.log('Invalid Passowrd');

@@ -2,8 +2,8 @@
 
 // console.log(a);
 
-let ans = process.env.MONGO_URL;
-console.log(ans)
+const ans = process.env.MONGO_URL;
+console.log(ans);
 
-let secret = process.env.COMPANY_SECRET_KEY
-console.log(secret)
+const secret = process.env.COMPANY_SECRET_KEY;
+console.log(secret);
