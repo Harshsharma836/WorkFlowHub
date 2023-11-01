@@ -17,6 +17,6 @@ import { Company, CompanySchema } from 'src/company/schema/company.schema';
     ]),
   ],
   controllers: [EmployeeController],
-  providers: [EmployeeService, EmailService ],
+  providers: [EmployeeService, EmailService],
 })
 export class EmployeeModule {}

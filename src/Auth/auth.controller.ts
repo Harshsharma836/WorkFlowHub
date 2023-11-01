@@ -1,14 +1,26 @@
-import { Controller, UseGuards, Request, Post, Req } from '@nestjs/common';
+import {
+  Controller,
+  UseGuards,
+  Request,
+  Post,
+  Req,
+  Inject,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   LocalAuthGuardCompany,
   LocalAuthGuardEmployee,
 } from './local.auth.guard';
 import { JwtAuthGuardCompany, JwtAuthGuardEmployee } from './jwt.auth.guard';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    @Inject(CACHE_MANAGER) private cacheService: Cache,
+  ) {}
 
   // For Company :
 
@@ -30,6 +42,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuardEmployee)
   @Post('loginEmp')
   async loginEmployee(@Request() req) {
+    await this.cacheService.set('employee', req.employee); // 3 params key ,val,ttl
     return this.authService.loginEmployee(req.employee, 'employee'); // giving the role
   }
 

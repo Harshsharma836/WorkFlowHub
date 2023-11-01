@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -11,7 +11,8 @@ import { Cron } from '@nestjs/schedule';
 import { EmailService } from 'src/email/email.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FcmNotificationService } from 'src/fcm-notification/fcm-notification.service';
-import { count } from 'console';
+import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class ProjectService {
@@ -24,10 +25,10 @@ export class ProjectService {
     private projectStatusModel: Model<ProjectStatus>,
     // for email service
     private readonly emailService: EmailService,
-    // for event
-    private eventEmitter: EventEmitter2,
     // for notification
     private fcmNotificationService: FcmNotificationService,
+    // for caching
+    @Inject(CACHE_MANAGER) private cacheService: Cache,
   ) {}
 
   async create(createProjectDto: CreateProjectDto, employee) {
@@ -44,8 +45,13 @@ export class ProjectService {
     return project;
   }
 
+  async getProjectById(projectid) {
+    const p = await this.projectModel.findById(projectid);
+    return p;
+  }
+
   async getProjects(employee, skip, limit) {
-    let count = await this.projectModel
+    const count = await this.projectModel
       .countDocuments({ employeeId: employee.employeeid })
       .exec();
     const page_total = Math.floor((count - 1) / limit) + 1;
@@ -80,7 +86,7 @@ export class ProjectService {
   }
 
   async remove(id: number) {
-    let projectRemove = await this.projectModel.findOneAndDelete({ id });
+    const projectRemove = await this.projectModel.findOneAndDelete({ id });
     return `Project removed , Id is ${id}`;
   }
 
@@ -106,24 +112,21 @@ export class ProjectService {
   }
 
   // We check at 7 p.m. that the employee has given an update on the project by checking the (status), using projectId on project status collection.
-  //@Cron('20 * * * * *')
-  // @Cron('0 19 * * *')
+  @Cron('0 19 * * *')
   async checkProjectStatusUpdates() {
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];
-
+    let map = new Map();
     // Fetching the Project which are not updated till 7 pm
     const projectStatuses = await this.projectStatusModel.find({
       timestamp: formattedDate,
       status: 'undone',
     });
-
     const emailPromises = projectStatuses.map(async (projectStatus) => {
       // Check if the timestamp is today
       if (projectStatus.timestamp === formattedDate) {
         const { employeeId } = projectStatus;
         const employee = await this.employeeModel.findOne(employeeId);
-
         // Employee hasn't provided an update for today, take action, send a notification and a mail.
         const subject = `Project Update Reminder ${projectStatus.name}`;
         const text = `Friendly Reminder: Project ${projectStatus.name} Update Due at 7 PM`;
@@ -134,7 +137,15 @@ export class ProjectService {
           // It's sending reminder mail to employees
           //await this.emailService.sendEmail(employee.email, subject, text);
 
-          // for sending notification to employees
+          // Identifying and counting number of project pending for each employee
+          if (map.has(employee.email)) {
+            let val = map.get(employee.email);
+            map.set(employee.email, val + 1);
+          } else {
+            map.set(employee.email, 1);
+          }
+
+          // for sending notification to employees, require token from frontend.
           await this.fcmNotificationService.sendingNotificationOneUser(
             token,
             subject,
@@ -149,11 +160,16 @@ export class ProjectService {
       }
     });
 
+    // storing this in Redis Cache memory
     await Promise.all(emailPromises);
-
+    map.forEach(async (val, index) => {
+      await this.cacheService.set(index, val);
+    });
     return {
       status: 'success',
       message: 'Emails sent to employees with pending project statuses.',
     };
   }
+  // testing redis db for cache
+  async findProjectById() {}
 }

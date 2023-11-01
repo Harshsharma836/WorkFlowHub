@@ -1,9 +1,8 @@
-// let a = process.env.EMPLOYEE_SECRET_KEY
+const arr = [4, 6, 32, 12, 42, 12, 45, 77, 86, 43, 22];
 
-// console.log(a);
+const ans = arr.reduce((acc, curr, index, arr) => {
+  console.log(index);
+  return (acc += curr);
+}, 10000);
 
-const ans = process.env.MONGO_URL;
 console.log(ans);
-
-const secret = process.env.COMPANY_SECRET_KEY;
-console.log(secret);

@@ -26,14 +26,16 @@ export class EmployeeService {
   }
 
   // send leave mail to company
-  async sendLeaveMail(employee , subject , text){
-    let employeeData = await this.employeeModel.findById(employee.employeeid);
-    let comapnyDetails = await this.companyModel.findById(employeeData.companyId)
-    let comanyEmail =  comapnyDetails.companyemail;
-    let ans = await this.emailService.sendEmail( comanyEmail , subject, text);
+  async sendLeaveMail(employee, subject, text) {
+    const employeeData = await this.employeeModel.findById(employee.employeeid);
+    const comapnyDetails = await this.companyModel.findById(
+      employeeData.companyId,
+    );
+    const comanyEmail = comapnyDetails.companyemail;
+    const ans = await this.emailService.sendEmail(comanyEmail, subject, text);
     return {
-      res : ans
-    }
+      res: ans,
+    };
   }
 
   // For OTP :

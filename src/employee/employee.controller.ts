@@ -24,8 +24,12 @@ export class EmployeeController {
 
   @UseGuards(JwtAuthGuardEmployee)
   @Post('leavemail')
-  sendLeaveMail(@Body() body  , @Req() req){
-    return this.employeeService.sendLeaveMail(req.employee , body.subject , body.msg);
+  sendLeaveMail(@Body() body, @Req() req) {
+    return this.employeeService.sendLeaveMail(
+      req.employee,
+      body.subject,
+      body.msg,
+    );
   }
 
   // otp

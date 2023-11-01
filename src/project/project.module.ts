@@ -10,6 +10,7 @@ import {
 } from './schema/ProjectStatus.schema';
 import { EmailService } from 'src/email/email.service';
 import { FcmNotificationService } from 'src/fcm-notification/fcm-notification.service';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
