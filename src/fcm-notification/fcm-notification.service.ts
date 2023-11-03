@@ -4,11 +4,9 @@ import * as admin from 'firebase-admin';
 
 admin.initializeApp({
   credential: admin.credential.cert({
-    projectId: 'taskunityproject', // replace with your app project-ID
-    clientEmail:
-      'firebase-adminsdk-vg56w@taskunityproject.iam.gserviceaccount.com', //replace with your app CLIENT-KEY
-    privateKey:
-     
+    projectId: process.env.projectId, // replace with your app project-ID
+    clientEmail: process.env.clientEmail, //replace with your app CLIENT-KEY
+    privateKey: process.env.projectKey
   }),
 });
 

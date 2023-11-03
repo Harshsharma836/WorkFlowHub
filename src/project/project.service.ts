@@ -127,23 +127,17 @@ export class ProjectService {
       if (projectStatus.timestamp === formattedDate) {
         const { employeeId } = projectStatus;
         const employee = await this.employeeModel.findOne(employeeId);
+
         // Employee hasn't provided an update for today, take action, send a notification and a mail.
         const subject = `Project Update Reminder ${projectStatus.name}`;
         const text = `Friendly Reminder: Project ${projectStatus.name} Update Due at 7 PM`;
-        // This token is send by from the frontend , It is unique for very user.
-        const token =
-          'fSP_VgFKzhSmsZNFRaphxB:APA91bFXHIgmbI6RLDcnYss9JlyJLGpKYilFWEsgYe_rs8KhswImewbS33sSigFLWF2VKjwh54FhB7GSQHBZqgKYhpxcObu3AofGp9ZJLKPXIH1DKxIYa8nwhaZehnYbX0P4IPzLNF2Q'; // comes from the frontend
-        try {
-          // It's sending reminder mail to employees
-          //await this.emailService.sendEmail(employee.email, subject, text);
 
-          // Identifying and counting number of project pending for each employee
-          if (map.has(employee.email)) {
-            let val = map.get(employee.email);
-            map.set(employee.email, val + 1);
-          } else {
-            map.set(employee.email, 1);
-          }
+        // This token is send by from the frontend , It is unique for very user.
+        const token = ''; // It Comes from the FrontEnd.
+
+        try {
+          // It's for sending reminder mail to employees daily at 7pm.
+          await this.emailService.sendEmail(employee.email, subject, text);
 
           // for sending notification to employees, require token from frontend.
           await this.fcmNotificationService.sendingNotificationOneUser(
@@ -162,9 +156,6 @@ export class ProjectService {
 
     // storing this in Redis Cache memory
     await Promise.all(emailPromises);
-    map.forEach(async (val, index) => {
-      await this.cacheService.set(index, val);
-    });
     return {
       status: 'success',
       message: 'Emails sent to employees with pending project statuses.',
