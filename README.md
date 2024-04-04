@@ -22,9 +22,5 @@ WorkFlowHub is a comprehensive employee and project management system built on t
 
 - **Firebase Cloud Messaging (FCM)**: Real-time notifications keep everyone informed and projects on track.
 
-- ### Database Schema
-  ![Task Unity (2)](https://github.com/Harshsharma836/TaskUnity-ManageEmployees/assets/70514943/3d045265-e816-4f00-b3ab-00a613fee3e1)
-
-
 If you want to explore more Nest.js projects, please check my repository at [https://github.com/Harshsharma836/NestJS_Projects](https://github.com/Harshsharma836/NestJS_Projects).
 
